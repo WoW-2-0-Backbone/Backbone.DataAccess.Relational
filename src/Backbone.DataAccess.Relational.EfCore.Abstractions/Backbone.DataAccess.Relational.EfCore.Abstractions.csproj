@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Title>WoW2.Backbone.DataAccess.Relational.EfCore.Abstractions</Title>
+        <PackageId>WoW2.Backbone.DataAccess.Relational.EfCore.Abstractions</PackageId>
+        <Description>Provides EF Core ORM integration abstractions</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>efcore, relational, database, orm, entity-framework</PackageTags>
+        <Version>8.0.0-alpha.0</Version>
+        <Authors>WoW 2.0 Team</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/WoW-2-0-Backbone/Backbone.DataAccess.Relational.Orms.EfCore</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/WoW-2-0-Backbone/Backbone.DataAccess.Relational.Orms.EfCore</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageIcon>wow2.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="wow2.png" Pack="true" PackagePath=""/>
+        <None Include="README.md" Pack="true" PackagePath=""/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="WoW2.Backbone.Comms.Infra.Abstractions" Version="8.0.0-alpha.7" />
+      <PackageReference Include="WoW2.Backbone.DataAccess.Relational.Entities" Version="8.0.0-alpha.0" />
+    </ItemGroup>
+
+</Project>
