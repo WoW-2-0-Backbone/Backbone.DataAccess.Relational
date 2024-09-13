@@ -3,7 +3,7 @@ namespace Backbone.DataAccess.Relational.Entities.Models;
 /// <summary>
 /// Defines an auditable entity with creation and modification tracks.
 /// </summary>
-public interface IAuditableEntity
+public interface IAuditableEntity : IEntity
 {
     /// <summary>
     /// Gets or sets entity creation time.

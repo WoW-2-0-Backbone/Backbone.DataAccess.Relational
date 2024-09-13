@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace Backbone.DataAccess.Relational.EfCore.Abstractions.Extensions;
 
 /// <summary>
-/// Contains EF core internal logic extensions.
+/// Contains extensions for query manipulation.
 /// </summary>
-public static class EfCoreExtensions
+public static class QueryExtensions
 {
     /// <summary>
     /// Applies tracking mode for queryable source of entities.
@@ -61,7 +61,7 @@ public static class EfCoreExtensions
         this IQueryable<TSource> filteredSource,
         IQueryable<TSource> source,
         CancellationToken cancellationToken = default
-    ) where TSource : class, IEntity
+    ) where TSource : class, IPrimaryEntity
     {
         var entitiesId = await filteredSource.Select(entity => entity.Id).ToListAsync(cancellationToken: cancellationToken);
         return source.Where(entity => entitiesId.Contains(entity.Id));

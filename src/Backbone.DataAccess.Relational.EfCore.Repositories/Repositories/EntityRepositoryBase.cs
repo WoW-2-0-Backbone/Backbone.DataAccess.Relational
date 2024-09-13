@@ -11,7 +11,7 @@ namespace Backbone.DataAccess.Relational.EfCore.Repositories.Repositories;
 /// <summary>
 /// Represents a base repository for entities with common CRUD operations.
 /// </summary>
-public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where TEntity : class, IEntity where TContext : DbContext
+public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where TEntity : class, IEntity where TContext : DbContext
 {
     /// <summary>
     /// Gets the database context instance.
@@ -37,24 +37,6 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
             initialQuery = initialQuery.Where(predicate);
 
         return initialQuery.ApplyTrackingMode(queryOptions.TrackingMode);
-    }
-
-    /// <summary>
-    /// Gets a single entity by ID from a database or local entities' snapshot.
-    /// </summary>
-    /// <param name="entityId">The ID of entity to query.</param>
-    /// <param name="queryOptions">The options to query</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>The found entity if exists, otherwise null</returns>
-    protected virtual async ValueTask<TEntity?> GetByIdAsync(
-        Guid entityId,
-        QueryOptions queryOptions = default,
-        CancellationToken cancellationToken = default
-    )
-    {
-        // Query from local entities snapshot and from database only if not found 
-        return Entities.Local.FirstOrDefault(entity => entity.Id == entityId)
-               ?? await Get(existingEntity => existingEntity.Id == entityId, queryOptions).FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
@@ -112,8 +94,6 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         CancellationToken cancellationToken = default
     )
     {
-        entity.Id = Guid.NewGuid();
-
         await Entities.AddAsync(entity, cancellationToken);
 
         if (!commandOptions.SkipSavingChanges)
@@ -162,7 +142,7 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
     }
 
     /// <summary>
-    /// Deletes an existing entity by Id
+    /// Deletes an existing entity by ID.
     /// </summary>
     /// <param name="entity">Entity to delete</param>
     /// <param name="commandOptions">Delete command options</param>
@@ -175,27 +155,6 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
     )
     {
         Entities.Remove(entity);
-
-        if (!commandOptions.SkipSavingChanges)
-            await DbContext.SaveChangesAsync(cancellationToken);
-
-        return entity;
-    }
-
-    /// <summary>
-    /// Deletes an existing entity by Id
-    /// </summary>
-    /// <param name="entityId">Id of entity to delete</param>
-    /// <param name="commandOptions">Delete command options</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>Deletion result</returns>
-    protected virtual async ValueTask<TEntity?> DeleteByIdAsync(Guid entityId, CommandOptions commandOptions,
-        CancellationToken cancellationToken = default)
-    {
-        var entity = await GetByIdAsync(entityId, cancellationToken: cancellationToken) ??
-                     throw new InvalidOperationException();
-
-        DbContext.Remove(entity);
 
         if (!commandOptions.SkipSavingChanges)
             await DbContext.SaveChangesAsync(cancellationToken);
