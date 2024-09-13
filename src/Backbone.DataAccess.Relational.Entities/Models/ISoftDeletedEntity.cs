@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines an entity that supports soft deletion.
 /// </summary>
-public interface ISoftDeletedEntity
+public interface ISoftDeletedEntity : IEntity
 {
     /// <summary>
     /// Gets or sets entity deleted indicator.

@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines an entity that is auditable for deletion tracking.
 /// </summary>
-public interface IDeletionAuditableEntity
+public interface IDeletionAuditableEntity : IEntity
 {
     /// <summary>
     /// Gets or sets the ID of the user who deleted the entity.
