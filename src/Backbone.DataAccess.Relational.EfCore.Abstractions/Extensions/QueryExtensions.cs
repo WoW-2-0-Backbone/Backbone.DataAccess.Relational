@@ -57,13 +57,16 @@ public static class QueryExtensions
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <typeparam name="TSource">Query source type</typeparam>
     /// <returns>Query source with filter of matched entities IDs set.</returns>
-    public static async ValueTask<IQueryable<TSource>> GetFilteredEntitiesQueryAsync<TSource>(
+    public static async ValueTask<IQueryable<TSource>> GetFilteredEntitiesQueryAsync<TKey, TSource>(
         this IQueryable<TSource> filteredSource,
         IQueryable<TSource> source,
         CancellationToken cancellationToken = default
-    ) where TSource : class, IPrimaryEntity
+    ) where TSource : class, IPrimaryEntity<TKey>
     {
-        var entitiesId = await filteredSource.Select(entity => entity.Id).ToListAsync(cancellationToken: cancellationToken);
+        var entitiesId = await filteredSource
+            .Select(entity => entity.Id)
+            .ToListAsync(cancellationToken: cancellationToken);
+        
         return source.Where(entity => entitiesId.Contains(entity.Id));
     }
 }
