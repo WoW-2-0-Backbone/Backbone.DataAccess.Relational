@@ -12,12 +12,12 @@ namespace Backbone.DataAccess.Relational.EfCore.Repositories.Cached.Repositories
 /// <summary>
 /// Represents a base repository with caching for entities with common CRUD operations.
 /// </summary>
-public class CachedPrimaryEntityRepositoryBase<TEntity, TContext>(
+public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     TContext dbContext,
     ICacheStorageBroker cacheStorageBroker,
     CacheEntryOptions? cacheEntryOptions = default
-) : PrimaryEntityRepositoryBase<TEntity, TContext>(dbContext)
-    where TEntity : class, IPrimaryEntity, ICacheEntry where TContext : DbContext
+) : PrimaryEntityRepositoryBase<TKey, TEntity, TContext>(dbContext)
+    where TEntity : class, IPrimaryEntity<TKey>, ICacheEntry where TContext : DbContext
 {
     /// <summary>
     /// Gets cache storage broker instance.
@@ -32,20 +32,20 @@ public class CachedPrimaryEntityRepositoryBase<TEntity, TContext>(
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Entity if found, otherwise null</returns>
     protected override async ValueTask<TEntity?> GetByIdAsync(
-        Guid entityId,
+        TKey entityId,
         QueryOptions queryOptions = default,
         CancellationToken cancellationToken = default
     )
     {
         // Query from local entities snapshot storage.
-        var entity = Entities.Local.FirstOrDefault(entity => entity.Id == entityId);
+        var entity = Entities.Local.FirstOrDefault(entity => entity.Id!.Equals(entityId));
         if (entity is not null)
             return entity;
 
         // Query from cache storage.
         entity = await CacheStorageBroker.GetOrSetAsync(
             entityId.ToString(),
-            async ct => await Get(existingEntity => existingEntity.Id == entityId, queryOptions)
+            async ct => await Get(existingEntity => existingEntity.Id!.Equals(entityId), queryOptions)
                 .FirstOrDefaultAsync(ct),
             cacheEntryOptions,
             entry =>
@@ -95,7 +95,7 @@ public class CachedPrimaryEntityRepositoryBase<TEntity, TContext>(
         await base.UpdateAsync(entity, commandOptions, cancellationToken);
 
         // Save to cache storage.
-        await CacheStorageBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions, cancellationToken);
+        await CacheStorageBroker.SetAsync(entity.Id!.ToString()!, entity, cacheEntryOptions, cancellationToken);
 
         return entity;
     }
@@ -129,7 +129,7 @@ public class CachedPrimaryEntityRepositoryBase<TEntity, TContext>(
     /// <param name="commandOptions">Delete command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Deletion result</returns>
-    protected override async ValueTask<TEntity?> DeleteByIdAsync(Guid entityId, CommandOptions commandOptions,
+    protected override async ValueTask<TEntity?> DeleteByIdAsync(TKey entityId, CommandOptions commandOptions,
         CancellationToken cancellationToken = default)
     {
         // Save to a database storage.

@@ -10,7 +10,7 @@
         <Description>Provides entity abstraction interfaces</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>interfaces, auditable, entity, soft-deletion</PackageTags>
-        <Version>8.0.0-alpha.1</Version>
+        <Version>8.0.0-alpha.3</Version>
         <Authors>WoW 2.0 Team</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/WoW-2-0-Backbone/Backbone.DataAccess.Relational.Entities</PackageProjectUrl>
