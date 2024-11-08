@@ -1,6 +1,4 @@
 using Backbone.Comms.Infra.Abstractions.Commands;
-using Backbone.Comms.Infra.Abstractions.Queries;
-using Backbone.DataAccess.Relational.EfCore.Abstractions.Extensions;
 using Backbone.DataAccess.Relational.EfCore.Repositories.Repositories;
 using Backbone.DataAccess.Relational.Entities.Models;
 using Backbone.Storage.Cache.Abstractions.Brokers;
@@ -19,9 +17,14 @@ public class CachedEntityRepositoryBase<TEntity, TContext>(
 ) : EntityRepositoryBase<TEntity, TContext>(dbContext) where TEntity : class, IEntity, ICacheEntry where TContext : DbContext
 {
     /// <summary>
+    /// Gets cache entry options.
+    /// </summary>
+    public readonly CacheEntryOptions? CacheEntryOptions = cacheEntryOptions;
+    
+    /// <summary>
     /// Gets cache storage broker instance.
     /// </summary>
-    protected readonly ICacheStorageBroker CacheStorageBroker = cacheStorageBroker;
+    public readonly ICacheStorageBroker CacheStorageBroker = cacheStorageBroker;
 
     /// <summary>
     /// Creates a new entity
@@ -30,7 +33,7 @@ public class CachedEntityRepositoryBase<TEntity, TContext>(
     /// <param name="commandOptions">Create command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Created entity</returns>
-    protected override async ValueTask<TEntity> CreateAsync(
+    public override async ValueTask<TEntity> CreateAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
@@ -40,7 +43,7 @@ public class CachedEntityRepositoryBase<TEntity, TContext>(
         await base.CreateAsync(entity, commandOptions, cancellationToken);
 
         // Save to cache storage.
-        await CacheStorageBroker.SetAsync(entity.CacheKey, entity, cacheEntryOptions, cancellationToken);
+        await CacheStorageBroker.SetAsync(entity.CacheKey, entity, CacheEntryOptions, cancellationToken);
 
         return entity;
     }
@@ -52,14 +55,14 @@ public class CachedEntityRepositoryBase<TEntity, TContext>(
     /// <param name="commandOptions">Update command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Updated entity</returns>
-    protected override async ValueTask<TEntity> UpdateAsync(TEntity entity, CommandOptions commandOptions,
+    public override async ValueTask<TEntity> UpdateAsync(TEntity entity, CommandOptions commandOptions,
         CancellationToken cancellationToken = default)
     {
         // Save to a database storage.
         await base.UpdateAsync(entity, commandOptions, cancellationToken);
 
         // Save to cache storage.
-        await CacheStorageBroker.SetAsync(entity.CacheKey, entity, cacheEntryOptions, cancellationToken);
+        await CacheStorageBroker.SetAsync(entity.CacheKey, entity, CacheEntryOptions, cancellationToken);
 
         return entity;
     }
@@ -71,7 +74,7 @@ public class CachedEntityRepositoryBase<TEntity, TContext>(
     /// <param name="commandOptions">Delete command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Updated entity if soft deleted, otherwise null</returns>
-    protected override async ValueTask<TEntity?> DeleteAsync(
+    public override async ValueTask<TEntity?> DeleteAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
