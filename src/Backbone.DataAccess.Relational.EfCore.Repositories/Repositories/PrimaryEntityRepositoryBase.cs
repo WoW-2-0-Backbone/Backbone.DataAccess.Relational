@@ -18,7 +18,7 @@ public class PrimaryEntityRepositoryBase<TKey, TEntity, TContext>(TContext dbCon
     /// <param name="queryOptions">The options to query</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>The found entity if exists, otherwise null</returns>
-    protected virtual async ValueTask<TEntity?> GetByIdAsync(
+    public virtual async ValueTask<TEntity?> GetByIdAsync(
         TKey entityId,
         QueryOptions queryOptions = default,
         CancellationToken cancellationToken = default
@@ -36,7 +36,7 @@ public class PrimaryEntityRepositoryBase<TKey, TEntity, TContext>(TContext dbCon
     /// <param name="commandOptions">Create command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>The created entity</returns>
-    protected override async ValueTask<TEntity> CreateAsync(
+    public override async ValueTask<TEntity> CreateAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
@@ -57,7 +57,7 @@ public class PrimaryEntityRepositoryBase<TKey, TEntity, TContext>(TContext dbCon
     /// <param name="commandOptions">Delete command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Deletion result</returns>
-    protected virtual async ValueTask<TEntity?> DeleteByIdAsync(TKey entityId, CommandOptions commandOptions,
+    public virtual async ValueTask<TEntity?> DeleteByIdAsync(TKey entityId, CommandOptions commandOptions,
         CancellationToken cancellationToken = default)
     {
         var entity = await GetByIdAsync(entityId, cancellationToken: cancellationToken) ??

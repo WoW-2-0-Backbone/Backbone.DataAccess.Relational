@@ -20,9 +20,14 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     where TEntity : class, IPrimaryEntity<TKey>, ICacheEntry where TContext : DbContext
 {
     /// <summary>
+    /// Gets cache entry options.
+    /// </summary>
+    public readonly CacheEntryOptions? CacheEntryOptions = cacheEntryOptions;
+    
+    /// <summary>
     /// Gets cache storage broker instance.
     /// </summary>
-    protected readonly ICacheStorageBroker CacheStorageBroker = cacheStorageBroker;
+    public readonly ICacheStorageBroker CacheStorageBroker = cacheStorageBroker;
     
     /// <summary>
     /// Gets an entity by ID from database or cache storage.
@@ -31,7 +36,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     /// <param name="queryOptions">Query options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Entity if found, otherwise null</returns>
-    protected override async ValueTask<TEntity?> GetByIdAsync(
+    public override async ValueTask<TEntity?> GetByIdAsync(
         TKey entityId,
         QueryOptions queryOptions = default,
         CancellationToken cancellationToken = default
@@ -47,7 +52,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
             entityId.ToString(),
             async ct => await Get(existingEntity => existingEntity.Id!.Equals(entityId), queryOptions)
                 .FirstOrDefaultAsync(ct),
-            cacheEntryOptions,
+            CacheEntryOptions,
             entry =>
             {
                 if (entry is not null)
@@ -66,7 +71,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     /// <param name="commandOptions">Create command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Created entity</returns>
-    protected override async ValueTask<TEntity> CreateAsync(
+    public override async ValueTask<TEntity> CreateAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
@@ -76,7 +81,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
         await base.CreateAsync(entity, commandOptions, cancellationToken);
 
         // Save to cache storage.
-        await CacheStorageBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions, cancellationToken);
+        await CacheStorageBroker.SetAsync(entity.Id.ToString(), entity, CacheEntryOptions, cancellationToken);
 
         return entity;
     }
@@ -88,14 +93,14 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     /// <param name="commandOptions">Update command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Updated entity</returns>
-    protected override async ValueTask<TEntity> UpdateAsync(TEntity entity, CommandOptions commandOptions,
+    public override async ValueTask<TEntity> UpdateAsync(TEntity entity, CommandOptions commandOptions,
         CancellationToken cancellationToken = default)
     {
         // Save to a database storage.
         await base.UpdateAsync(entity, commandOptions, cancellationToken);
 
         // Save to cache storage.
-        await CacheStorageBroker.SetAsync(entity.Id!.ToString()!, entity, cacheEntryOptions, cancellationToken);
+        await CacheStorageBroker.SetAsync(entity.Id!.ToString()!, entity, CacheEntryOptions, cancellationToken);
 
         return entity;
     }
@@ -107,7 +112,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     /// <param name="commandOptions">Delete command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Updated entity if soft deleted, otherwise null</returns>
-    protected override async ValueTask<TEntity?> DeleteAsync(
+    public override async ValueTask<TEntity?> DeleteAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
@@ -129,7 +134,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     /// <param name="commandOptions">Delete command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Deletion result</returns>
-    protected override async ValueTask<TEntity?> DeleteByIdAsync(TKey entityId, CommandOptions commandOptions,
+    public override async ValueTask<TEntity?> DeleteByIdAsync(TKey entityId, CommandOptions commandOptions,
         CancellationToken cancellationToken = default)
     {
         // Save to a database storage.
@@ -147,7 +152,7 @@ public class CachedPrimaryEntityRepositoryBase<TKey, TEntity, TContext>(
     /// </summary>
     /// <param name="source">A function that selects the entities to be deleted.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    protected override async ValueTask DeleteBatchAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> source,
+    public override async ValueTask DeleteBatchAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> source,
         CancellationToken cancellationToken = default)
     {
         // Query matching entities ID

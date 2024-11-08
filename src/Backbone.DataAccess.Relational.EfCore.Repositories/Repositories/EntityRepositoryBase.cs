@@ -29,7 +29,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="predicate">Entity filter predicate</param>
     /// <param name="queryOptions">Query options</param>
     /// <returns>Queryable source of entities</returns>
-    protected virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>>? predicate = default, QueryOptions queryOptions = default)
+    public virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>>? predicate = default, QueryOptions queryOptions = default)
     {
         var initialQuery = Entities.Where(entity => true);
 
@@ -46,7 +46,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="expectedValue">Expected value to check against the result</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>True if entity exists, otherwise false</returns>
-    protected virtual async ValueTask<bool> CheckAsync<TValue>(
+    public virtual async ValueTask<bool> CheckAsync<TValue>(
         IQueryable<TValue> queryableSource, 
         TValue? expectedValue = default,
         CancellationToken cancellationToken = default)
@@ -65,7 +65,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="memberSelector">Expression that selects the member of entity as a result</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>True if entity exists, otherwise false</returns>
-    protected virtual async ValueTask<(bool Result, TProperty Property)> CheckAsync<TProperty>(
+    public virtual async ValueTask<(bool Result, TProperty Property)> CheckAsync<TProperty>(
         Expression<Func<TEntity, bool>> predicate,
         Expression<Func<TEntity, TProperty>> memberSelector,
         CancellationToken cancellationToken = default
@@ -88,7 +88,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="commandOptions">Create command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>The created entity</returns>
-    protected virtual async ValueTask<TEntity> CreateAsync(
+    public virtual async ValueTask<TEntity> CreateAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
@@ -109,7 +109,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="commandOptions">Update command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>The Updated entity</returns>
-    protected virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, CommandOptions commandOptions,
+    public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, CommandOptions commandOptions,
         CancellationToken cancellationToken = default)
     {
         Entities.Update(entity);
@@ -127,7 +127,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="setPropertyCalls">Batch update value selectors</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Number of updated rows.</returns>
-    protected virtual async ValueTask<int> UpdateBatchAsync(
+    public virtual async ValueTask<int> UpdateBatchAsync(
         Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertyCalls,
         Expression<Func<TEntity, bool>>? batchUpdatePredicate = default,
         CancellationToken cancellationToken = default
@@ -148,7 +148,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// <param name="commandOptions">Delete command options</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Updated entity if soft deleted, otherwise null</returns>
-    protected virtual async ValueTask<TEntity?> DeleteAsync(
+    public virtual async ValueTask<TEntity?> DeleteAsync(
         TEntity entity,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default
@@ -167,7 +167,7 @@ public class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where T
     /// </summary>
     /// <param name="source">A function that selects the entities to be deleted.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    protected virtual async ValueTask DeleteBatchAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> source,
+    public virtual async ValueTask DeleteBatchAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> source,
         CancellationToken cancellationToken = default)
     {
         await source(Entities).ExecuteDeleteAsync(cancellationToken: cancellationToken);
